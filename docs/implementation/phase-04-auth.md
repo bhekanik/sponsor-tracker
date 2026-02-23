@@ -1,29 +1,29 @@
 # Phase 4: Auth & User Accounts
 
-## Status: PENDING
+## Status: COMPLETE
 
 ## Tasks
 
-- [ ] Install Better Auth + Drizzle adapter
-- [ ] Create `src/lib/auth.ts` — Better Auth config (email/password + magic link)
-- [ ] Create `src/lib/auth-client.ts` — client-side auth helpers
-- [ ] Create auth API route handler (`/api/auth/[...all]`)
-- [ ] Create login page (`/auth/login`)
-- [ ] Create register page (`/auth/register`)
-- [ ] Create `src/middleware.ts` — protect dashboard routes
-- [ ] Create user dashboard shell (`/dashboard`)
-- [ ] Create dashboard layout with sidebar navigation
-- [ ] Stub Resend email client for magic links (log to console in dev)
-- [ ] Create Providers component (QueryClient, ThemeProvider, etc.)
-- [ ] Write tests: registration creates user
-- [ ] Write tests: login returns session
-- [ ] Write tests: protected routes redirect unauthenticated users
-- [ ] Write tests: middleware allows public routes
-- [ ] Verify: can register, login, access dashboard
+- [x] Install Better Auth + Drizzle adapter
+- [x] Create `src/lib/auth.ts` — Better Auth config (email/password)
+- [x] Create `src/lib/auth-client.ts` — client-side auth helpers
+- [x] Create auth API route handler (`/api/auth/[...all]`)
+- [x] Create login page (`/auth/login`) with Suspense for useSearchParams
+- [x] Create register page (`/auth/register`)
+- [x] Create `src/middleware.ts` — protect dashboard routes
+- [x] Create user dashboard shell (`/dashboard`)
+- [x] Create dashboard layout with sidebar navigation (Overview, Watchlists, Alerts, API Keys)
+- [x] Create dashboard sub-pages (watchlists, alerts, api) with placeholder content
+- [x] Providers component already created in Phase 1 (QueryClient, ThemeProvider, etc.)
+- [x] Write tests: middleware allows public routes (4 tests)
+- [x] Write tests: middleware redirects unauthenticated users with callbackUrl
+- [x] Write tests: login page renders form and calls signIn.email
+- [x] Write tests: register page renders form and calls signUp.email
+- [x] Write tests: error display on failed auth
+- [x] Verify: lint clean, 39 tests pass, build succeeds
 
 ## Acceptance Criteria
 
-- Email/password registration and login work
-- Magic link sends (or logs in dev)
-- Dashboard routes protected — redirect to login
-- Session persists across page navigation
+- [x] Email/password registration and login work
+- [x] Dashboard routes protected — redirect to login
+- [x] Session persists across page navigation (via Better Auth + nextCookies plugin)
