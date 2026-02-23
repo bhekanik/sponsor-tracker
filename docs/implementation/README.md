@@ -9,7 +9,7 @@
 | [Phase 3](./phase-03-search.md) | COMPLETE | Search |
 | [Phase 4](./phase-04-auth.md) | COMPLETE | Auth & User Accounts |
 | [Phase 5](./phase-05-watchlists.md) | COMPLETE | Watchlists & Rules |
-| [Phase 6](./phase-06-notifications.md) | PENDING | Notifications & Alerts |
+| [Phase 6](./phase-06-notifications.md) | COMPLETE | Notifications & Alerts |
 | [Phase 7](./phase-07-api.md) | PENDING | API |
 | [Phase 8](./phase-08-polling.md) | PENDING | Scheduled Polling |
 | [Phase 9](./phase-09-payments.md) | PENDING | Payments |
