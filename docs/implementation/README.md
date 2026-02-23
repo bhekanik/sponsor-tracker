@@ -1,0 +1,16 @@
+# Implementation Phases
+
+## Progress
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| [Phase 1](./phase-01-scaffold.md) | PENDING | Project Scaffold |
+| [Phase 2](./phase-02-ingestion.md) | PENDING | CSV Ingestion & Diff Engine |
+| [Phase 3](./phase-03-search.md) | PENDING | Search |
+| [Phase 4](./phase-04-auth.md) | PENDING | Auth & User Accounts |
+| [Phase 5](./phase-05-watchlists.md) | PENDING | Watchlists & Rules |
+| [Phase 6](./phase-06-notifications.md) | PENDING | Notifications & Alerts |
+| [Phase 7](./phase-07-api.md) | PENDING | API |
+| [Phase 8](./phase-08-polling.md) | PENDING | Scheduled Polling |
+| [Phase 9](./phase-09-payments.md) | PENDING | Payments |
+| [Phase 10](./phase-10-polish.md) | PENDING | Polish & Deploy |
