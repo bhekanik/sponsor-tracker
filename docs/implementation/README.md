@@ -4,7 +4,7 @@
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| [Phase 1](./phase-01-scaffold.md) | PENDING | Project Scaffold |
+| [Phase 1](./phase-01-scaffold.md) | COMPLETE | Project Scaffold |
 | [Phase 2](./phase-02-ingestion.md) | PENDING | CSV Ingestion & Diff Engine |
 | [Phase 3](./phase-03-search.md) | PENDING | Search |
 | [Phase 4](./phase-04-auth.md) | PENDING | Auth & User Accounts |
