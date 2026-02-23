@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { ArrowLeft, MapPin } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChangeTimeline } from "@/components/sponsor/change-timeline";
@@ -8,6 +9,21 @@ import { sponsors } from "@/db/schema";
 
 interface SponsorPageProps {
 	params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({
+	params,
+}: SponsorPageProps): Promise<Metadata> {
+	const { id } = await params;
+	const [sponsor] = await db
+		.select({ canonicalName: sponsors.canonicalName })
+		.from(sponsors)
+		.where(eq(sponsors.id, id));
+	if (!sponsor) return { title: "Sponsor Not Found" };
+	return {
+		title: `${sponsor.canonicalName}`,
+		description: `View sponsorship details and change history for ${sponsor.canonicalName}. UK Home Office Register of Licensed Sponsors.`,
+	};
 }
 
 export default async function SponsorPage({ params }: SponsorPageProps) {
@@ -22,8 +38,27 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 	const isActive = sponsor.status === "active";
 	const isArating = sponsor.rating?.includes("A");
 
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		name: sponsor.canonicalName,
+		...(sponsor.town && {
+			address: {
+				"@type": "PostalAddress",
+				addressLocality: sponsor.town,
+				...(sponsor.county && { addressRegion: sponsor.county }),
+				addressCountry: "GB",
+			},
+		}),
+	};
+
 	return (
 		<div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: structured data from DB, not user input
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+			/>
 			<Link
 				href="/search"
 				className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"

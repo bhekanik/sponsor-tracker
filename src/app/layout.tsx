@@ -12,9 +12,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-	title: "SponsorTracker — Track UK Visa Sponsor Changes",
+	title: {
+		default: "SponsorTracker — Track UK Visa Sponsor Changes",
+		template: "%s | SponsorTracker",
+	},
 	description:
 		"Monitor the UK Home Office Register of Licensed Sponsors. Get notified when companies are added, removed, or updated.",
+	openGraph: {
+		title: "SponsorTracker — Track UK Visa Sponsor Changes",
+		description:
+			"Monitor the UK Home Office Register of Licensed Sponsors. Get notified when companies are added, removed, or updated.",
+		siteName: "SponsorTracker",
+		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "SponsorTracker — Track UK Visa Sponsor Changes",
+		description: "Monitor the UK Home Office Register of Licensed Sponsors.",
+	},
 };
 
 export default function RootLayout({

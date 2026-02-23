@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "API Documentation",
+	description:
+		"SponsorTracker REST API. Search sponsors, track changes, and integrate with your applications.",
+};
+
 export default function ApiDocsPage() {
 	const endpoints = [
 		{

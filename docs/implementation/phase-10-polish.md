@@ -1,24 +1,24 @@
 # Phase 10: Polish & Deploy
 
-## Status: PENDING
+## Status: COMPLETE
 
 ## Tasks
 
-- [ ] SEO: meta tags, OG images for all pages
-- [ ] SEO: structured data (Organization schema) for sponsor pages
-- [ ] SEO: auto-generated title tags per sponsor
-- [ ] Landing page: hero, search bar, "what changed today" preview, pricing CTA
-- [ ] About page: data source, FAQ, disclaimers
-- [ ] Responsive design pass (desktop-first, mobile-friendly)
-- [ ] Loading states: skeleton components for search, changes, dashboard
-- [ ] Error boundaries for graceful failures
-- [ ] Create `robots.txt`
-- [ ] Create dynamic sitemap (`/sitemap.xml`)
-- [ ] Final react-doctor check on all components
-- [ ] Full test suite green
-- [ ] Configure Vercel project with env vars
-- [ ] Deploy to Vercel
-- [ ] Verify: deployed, all features work in production
+- [x] SEO: meta tags, OG images for all pages
+- [x] SEO: structured data (Organization schema) for sponsor pages
+- [x] SEO: auto-generated title tags per sponsor
+- [x] Landing page: hero, search bar, "what changed today" preview, pricing CTA
+- [x] About page: data source, FAQ, disclaimers
+- [x] Responsive design pass (desktop-first, mobile-friendly)
+- [x] Loading states: skeleton components for search, changes, dashboard
+- [x] Error boundaries for graceful failures
+- [x] Create `robots.txt`
+- [x] Create dynamic sitemap (`/sitemap.xml`)
+- [x] Final react-doctor check on all components
+- [x] Full test suite green
+- [x] Configure Vercel project with env vars
+- [x] Deploy to Vercel
+- [x] Verify: deployed, all features work in production
 
 ## Acceptance Criteria
 

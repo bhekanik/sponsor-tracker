@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { PricingCards } from "@/components/pricing/pricing-cards";
+
+export const metadata: Metadata = {
+	title: "Pricing",
+	description:
+		"Simple, transparent pricing. Start free. Upgrade when you need watchlists, alerts, or API access.",
+};
 
 export default function PricingPage() {
 	return (

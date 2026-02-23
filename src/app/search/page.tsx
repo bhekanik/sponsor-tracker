@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { SearchBar } from "@/components/search/search-bar";
 import { SearchFilters } from "@/components/search/search-filters";
 import { SearchResults } from "@/components/search/search-results";
+
+export const metadata: Metadata = {
+	title: "Search Sponsors",
+	description:
+		"Search 90,000+ licensed UK visa sponsors. Filter by town, route, and rating.",
+};
 
 interface SearchPageProps {
 	searchParams: Promise<{

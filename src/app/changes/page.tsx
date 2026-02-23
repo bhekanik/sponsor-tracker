@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ChangeFeed } from "@/components/changes/change-feed";
+
+export const metadata: Metadata = {
+	title: "What Changed Today",
+	description:
+		"Daily updates from the UK Home Office Register of Licensed Sponsors. See which companies were added, removed, or updated.",
+};
 
 export default function ChangesPage() {
 	return (
