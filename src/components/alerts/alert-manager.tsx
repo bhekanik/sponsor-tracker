@@ -102,7 +102,7 @@ export function AlertManager() {
 				{[1, 2].map((i) => (
 					<div
 						key={i}
-						className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800"
+						className="h-16 animate-pulse rounded-lg bg-surface-raised"
 					/>
 				))}
 			</div>
@@ -116,7 +116,7 @@ export function AlertManager() {
 					<select
 						value={watchlistId}
 						onChange={(e) => setWatchlistId(e.target.value)}
-						className="rounded-md border border-gray-300 px-2 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+						className="rounded-md border border-border bg-surface px-2 py-2 text-sm"
 					>
 						<option value="">Select watchlist...</option>
 						{watchlists.map((w) => (
@@ -130,7 +130,7 @@ export function AlertManager() {
 						placeholder="Email address..."
 						value={destination}
 						onChange={(e) => setDestination(e.target.value)}
-						className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-900"
+						className="flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 					/>
 				</div>
 				<div className="flex items-center gap-3">
@@ -159,7 +159,7 @@ export function AlertManager() {
 						disabled={
 							createMutation.isPending || !watchlistId || !destination.trim()
 						}
-						className="ml-auto flex items-center gap-1 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+						className="ml-auto flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
 					>
 						<Plus className="h-4 w-4" />
 						Create alert
@@ -168,7 +168,7 @@ export function AlertManager() {
 			</form>
 
 			{alerts.length === 0 ? (
-				<p className="text-sm text-gray-500 dark:text-gray-400">
+				<p className="text-sm text-text-muted">
 					No alerts configured. Create one to get notified about sponsor
 					changes.
 				</p>
@@ -177,7 +177,7 @@ export function AlertManager() {
 					{alerts.map((alert) => (
 						<div
 							key={alert.id}
-							className="flex items-center justify-between rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+							className="flex items-center justify-between rounded-lg border border-border p-4"
 						>
 							<div className="flex items-center gap-3">
 								<button
@@ -189,7 +189,7 @@ export function AlertManager() {
 										})
 									}
 									className={
-										alert.enabled ? "text-indigo-600" : "text-gray-400"
+										alert.enabled ? "text-primary" : "text-text-muted"
 									}
 								>
 									{alert.enabled ? (
@@ -202,7 +202,7 @@ export function AlertManager() {
 									<p className="text-sm font-medium">
 										{wlMap.get(alert.watchlistId) ?? "Unknown watchlist"}
 									</p>
-									<p className="text-xs text-gray-500">
+									<p className="text-xs text-text-muted">
 										{alert.destination} · {alert.frequency}
 									</p>
 								</div>
@@ -210,7 +210,7 @@ export function AlertManager() {
 							<button
 								type="button"
 								onClick={() => deleteMutation.mutate(alert.id)}
-								className="text-gray-400 hover:text-red-500"
+								className="text-text-muted hover:text-red-500"
 							>
 								<Trash2 className="h-4 w-4" />
 							</button>

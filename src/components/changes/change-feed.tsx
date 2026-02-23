@@ -19,24 +19,34 @@ interface Change {
 
 const TYPE_CONFIG: Record<
 	string,
-	{ icon: typeof Plus; label: string; color: string }
+	{ icon: typeof Plus; label: string; color: string; border: string }
 > = {
 	added: {
 		icon: Plus,
 		label: "Added",
 		color: "text-green-600 bg-green-50 dark:bg-green-900/20",
+		border: "border-l-green-500",
 	},
 	removed: {
 		icon: Minus,
 		label: "Removed",
 		color: "text-red-600 bg-red-50 dark:bg-red-900/20",
+		border: "border-l-red-500",
 	},
 	updated: {
 		icon: RefreshCw,
 		label: "Updated",
 		color: "text-amber-600 bg-amber-50 dark:bg-amber-900/20",
+		border: "border-l-amber-500",
 	},
 };
+
+const filterOptions = [
+	{ value: "", label: "All" },
+	{ value: "added", label: "Added" },
+	{ value: "removed", label: "Removed" },
+	{ value: "updated", label: "Updated" },
+];
 
 export function ChangeFeed() {
 	const [filter, setFilter] = useState<string>("");
@@ -52,19 +62,20 @@ export function ChangeFeed() {
 
 	return (
 		<div className="space-y-4">
-			<div className="flex gap-2">
-				{["", "added", "removed", "updated"].map((type) => (
+			{/* Segmented control */}
+			<div className="inline-flex rounded-lg bg-surface-raised p-1 shadow-sm">
+				{filterOptions.map((opt) => (
 					<button
-						key={type}
+						key={opt.value}
 						type="button"
-						onClick={() => setFilter(type)}
-						className={`rounded-full px-3 py-1 text-sm ${
-							filter === type
-								? "bg-indigo-600 text-white"
-								: "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+						onClick={() => setFilter(opt.value)}
+						className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+							filter === opt.value
+								? "bg-surface text-text-primary shadow-sm"
+								: "text-text-secondary hover:text-text-primary"
 						}`}
 					>
-						{type || "All"}
+						{opt.label}
 					</button>
 				))}
 			</div>
@@ -74,25 +85,26 @@ export function ChangeFeed() {
 					{[1, 2, 3].map((i) => (
 						<div
 							key={i}
-							className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800"
+							className="h-16 animate-pulse rounded-lg bg-surface-raised"
 						/>
 					))}
 				</div>
 			) : changes.length === 0 ? (
-				<p className="py-8 text-center text-sm text-gray-500">
+				<p className="py-8 text-center text-sm text-text-muted">
 					No changes recorded yet. Changes will appear here after the next CSV
 					poll.
 				</p>
 			) : (
 				<div className="space-y-2">
-					{changes.map((change) => {
+					{changes.map((change, i) => {
 						const config =
 							TYPE_CONFIG[change.changeType] ?? TYPE_CONFIG.updated;
 						const Icon = config.icon;
 						return (
 							<div
 								key={change.id}
-								className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700"
+								className={`flex items-start gap-3 rounded-lg border border-border border-l-2 ${config.border} bg-surface p-3 animate-fade-up`}
+								style={{ animationDelay: `${i * 50}ms` }}
 							>
 								<div className={`mt-0.5 rounded-full p-1.5 ${config.color}`}>
 									<Icon className="h-3.5 w-3.5" />
@@ -100,33 +112,33 @@ export function ChangeFeed() {
 								<div className="min-w-0 flex-1">
 									<Link
 										href={`/sponsor/${change.sponsorId}`}
-										className="text-sm font-medium hover:text-indigo-600"
+										className="text-sm font-medium text-text-primary transition-colors hover:text-primary"
 									>
 										{change.sponsorName}
 									</Link>
 									{change.town && (
-										<span className="ml-2 text-xs text-gray-500">
+										<span className="ml-2 text-xs text-text-muted">
 											{change.town}
 										</span>
 									)}
-									<p className="text-xs text-gray-500">
+									<p className="text-xs text-text-secondary">
 										{config.label}
 										{change.field && (
 											<>
-												{" — "}
+												{" \u2014 "}
 												{change.field}:{" "}
 												<span className="text-red-500">
-													{change.oldValue ?? "—"}
+													{change.oldValue ?? "\u2014"}
 												</span>
 												<ArrowRight className="mx-1 inline h-3 w-3" />
 												<span className="text-green-600">
-													{change.newValue ?? "—"}
+													{change.newValue ?? "\u2014"}
 												</span>
 											</>
 										)}
 									</p>
 								</div>
-								<time className="shrink-0 text-xs text-gray-400">
+								<time className="shrink-0 text-xs text-text-muted">
 									{new Date(change.createdAt).toLocaleDateString()}
 								</time>
 							</div>

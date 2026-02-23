@@ -39,7 +39,7 @@ export function SearchResults(props: SearchResultsProps) {
 				{Array.from({ length: 5 }).map((_, i) => (
 					<div
 						key={`skeleton-${i}`}
-						className="h-24 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800"
+						className="h-24 animate-pulse rounded-xl bg-surface-raised"
 					/>
 				))}
 			</div>
@@ -54,7 +54,7 @@ export function SearchResults(props: SearchResultsProps) {
 
 	if (!data?.data?.length) {
 		return (
-			<p className="text-sm text-gray-500">
+			<p className="text-sm text-text-muted">
 				{props.q
 					? `No sponsors found matching "${props.q}"`
 					: "No sponsors found"}
@@ -64,22 +64,31 @@ export function SearchResults(props: SearchResultsProps) {
 
 	return (
 		<div>
-			<p className="mb-4 text-sm text-gray-500">
+			<p className="mb-4 text-sm text-text-secondary">
 				{data.total.toLocaleString()} sponsor{data.total !== 1 ? "s" : ""} found
 			</p>
 			<div className="space-y-3">
 				{data.data.map(
-					(sponsor: {
-						id: string;
-						canonicalName: string;
-						town: string | null;
-						county: string | null;
-						rating: string | null;
-						routes: string[] | null;
-						status: string;
-						lastSeenAt: string | null;
-					}) => (
-						<SponsorCard key={sponsor.id} {...sponsor} />
+					(
+						sponsor: {
+							id: string;
+							canonicalName: string;
+							town: string | null;
+							county: string | null;
+							rating: string | null;
+							routes: string[] | null;
+							status: string;
+							lastSeenAt: string | null;
+						},
+						i: number,
+					) => (
+						<div
+							key={sponsor.id}
+							className="animate-fade-up"
+							style={{ animationDelay: `${i * 50}ms` }}
+						>
+							<SponsorCard {...sponsor} />
+						</div>
 					),
 				)}
 			</div>
@@ -105,18 +114,18 @@ function Pagination({
 			{currentPage > 1 && (
 				<a
 					href={`?page=${currentPage - 1}`}
-					className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+					className="rounded-lg border border-border px-3 py-1 text-sm text-text-primary transition-colors hover:bg-surface-raised"
 				>
 					Previous
 				</a>
 			)}
-			<span className="text-sm text-gray-500">
+			<span className="text-sm text-text-secondary">
 				Page {currentPage} of {totalPages}
 			</span>
 			{currentPage < totalPages && (
 				<a
 					href={`?page=${currentPage + 1}`}
-					className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+					className="rounded-lg border border-border px-3 py-1 text-sm text-text-primary transition-colors hover:bg-surface-raised"
 				>
 					Next
 				</a>

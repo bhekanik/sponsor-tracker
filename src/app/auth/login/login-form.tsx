@@ -38,7 +38,7 @@ export function LoginForm() {
 			<div className="w-full max-w-sm space-y-6">
 				<div className="text-center">
 					<h1 className="text-2xl font-bold">Sign in</h1>
-					<p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+					<p className="mt-2 text-sm text-text-secondary">
 						Sign in to your SponsorTracker account.
 					</p>
 				</div>
@@ -52,7 +52,7 @@ export function LoginForm() {
 					<div>
 						<label
 							htmlFor="email"
-							className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							className="block text-sm font-medium text-text-primary"
 						>
 							Email
 						</label>
@@ -62,13 +62,13 @@ export function LoginForm() {
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							required
-							className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-900"
+							className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 						/>
 					</div>
 					<div>
 						<label
 							htmlFor="password"
-							className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							className="block text-sm font-medium text-text-primary"
 						>
 							Password
 						</label>
@@ -78,23 +78,23 @@ export function LoginForm() {
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
 							required
-							className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-900"
+							className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 						/>
 					</div>
 					<button
 						type="submit"
 						disabled={loading}
-						className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+						className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
 					>
 						{loading ? "Signing in..." : "Sign in"}
 					</button>
 				</form>
 
-				<p className="text-center text-sm text-gray-600 dark:text-gray-400">
+				<p className="text-center text-sm text-text-secondary">
 					Don't have an account?{" "}
 					<Link
 						href="/auth/register"
-						className="text-indigo-600 hover:underline"
+						className="text-primary hover:underline"
 					>
 						Create one
 					</Link>

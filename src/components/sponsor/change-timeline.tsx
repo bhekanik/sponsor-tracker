@@ -28,7 +28,7 @@ export function ChangeTimeline({ sponsorId }: { sponsorId: string }) {
 				{Array.from({ length: 3 }).map((_, i) => (
 					<div
 						key={`skeleton-${i}`}
-						className="h-12 animate-pulse rounded bg-gray-100 dark:bg-gray-800"
+						className="h-12 animate-pulse rounded bg-surface-raised"
 					/>
 				))}
 			</div>
@@ -37,30 +37,33 @@ export function ChangeTimeline({ sponsorId }: { sponsorId: string }) {
 
 	if (!data?.length) {
 		return (
-			<p className="text-sm text-gray-500">No change history recorded yet.</p>
+			<p className="text-sm text-text-muted">No change history recorded yet.</p>
 		);
 	}
 
 	return (
-		<div className="space-y-3">
-			{data.map((event) => (
+		<div className="relative space-y-3 pl-4">
+			{/* Vertical connecting line */}
+			<div className="absolute left-[1.1rem] top-2 bottom-2 w-px bg-border-muted" />
+			{data.map((event, i) => (
 				<div
 					key={event.id}
-					className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800"
+					className="relative flex items-start gap-3 rounded-lg border border-border bg-surface p-3 animate-fade-up"
+					style={{ animationDelay: `${i * 75}ms` }}
 				>
 					<ChangeIcon type={event.changeType} />
 					<div className="min-w-0 flex-1">
-						<p className="text-sm font-medium text-gray-900 dark:text-white">
+						<p className="text-sm font-medium text-text-primary">
 							{changeLabel(event)}
 						</p>
 						{event.field && (
-							<p className="mt-0.5 text-xs text-gray-500">
-								{event.field}: {event.oldValue ?? "—"}{" "}
+							<p className="mt-0.5 text-xs text-text-secondary">
+								{event.field}: {event.oldValue ?? "\u2014"}{" "}
 								<ArrowRight className="inline h-3 w-3" />{" "}
-								{event.newValue ?? "—"}
+								{event.newValue ?? "\u2014"}
 							</p>
 						)}
-						<p className="mt-1 text-xs text-gray-400">
+						<p className="mt-1 text-xs text-text-muted">
 							{new Date(event.createdAt).toLocaleDateString()}
 						</p>
 					</div>

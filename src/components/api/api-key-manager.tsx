@@ -43,7 +43,7 @@ export function ApiKeyManager() {
 
 	if (isLoading) {
 		return (
-			<div className="h-20 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
+			<div className="h-20 animate-pulse rounded-lg bg-surface-raised" />
 		);
 	}
 
@@ -51,8 +51,8 @@ export function ApiKeyManager() {
 		<div className="space-y-4">
 			{data?.apiKey ? (
 				<div className="space-y-3">
-					<div className="flex items-center gap-2 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-						<Key className="h-5 w-5 text-indigo-600" />
+					<div className="flex items-center gap-2 rounded-lg border border-border p-4">
+						<Key className="h-5 w-5 text-primary" />
 						<code className="flex-1 text-sm">
 							{showKey
 								? data.apiKey
@@ -61,14 +61,14 @@ export function ApiKeyManager() {
 						<button
 							type="button"
 							onClick={() => setShowKey(!showKey)}
-							className="text-xs text-indigo-600 hover:underline"
+							className="text-xs text-primary hover:underline"
 						>
 							{showKey ? "Hide" : "Show"}
 						</button>
 						<button
 							type="button"
 							onClick={copyKey}
-							className="text-gray-400 hover:text-gray-600"
+							className="text-text-muted hover:text-text-secondary"
 							title="Copy"
 						>
 							<Copy className="h-4 w-4" />
@@ -79,7 +79,7 @@ export function ApiKeyManager() {
 							type="button"
 							onClick={() => generateMutation.mutate()}
 							disabled={generateMutation.isPending}
-							className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+							className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm text-text-primary hover:bg-surface-raised"
 						>
 							<RefreshCw className="h-3.5 w-3.5" />
 							Regenerate
@@ -97,14 +97,14 @@ export function ApiKeyManager() {
 				</div>
 			) : (
 				<div className="text-center">
-					<p className="mb-4 text-sm text-gray-500">
+					<p className="mb-4 text-sm text-text-muted">
 						No API key generated yet.
 					</p>
 					<button
 						type="button"
 						onClick={() => generateMutation.mutate()}
 						disabled={generateMutation.isPending}
-						className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+						className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
 					>
 						<Key className="h-4 w-4" />
 						Generate API Key
@@ -112,9 +112,9 @@ export function ApiKeyManager() {
 				</div>
 			)}
 
-			<div className="rounded-lg bg-gray-50 p-4 text-sm dark:bg-gray-800/50">
+			<div className="rounded-lg bg-surface-raised p-4 text-sm">
 				<h3 className="font-medium">Usage</h3>
-				<pre className="mt-2 overflow-x-auto text-xs text-gray-600 dark:text-gray-400">
+				<pre className="mt-2 overflow-x-auto text-xs text-text-secondary">
 					{`curl -H "Authorization: Bearer YOUR_API_KEY" \\
   https://sponsortracker.uk/api/v1/sponsors/search?q=acme`}
 				</pre>

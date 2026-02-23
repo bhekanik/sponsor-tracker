@@ -68,7 +68,7 @@ export function WatchlistManager() {
 				{[1, 2].map((i) => (
 					<div
 						key={i}
-						className="h-16 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800"
+						className="h-16 animate-pulse rounded-lg bg-surface-raised"
 					/>
 				))}
 			</div>
@@ -83,12 +83,12 @@ export function WatchlistManager() {
 					placeholder="New watchlist name..."
 					value={newName}
 					onChange={(e) => setNewName(e.target.value)}
-					className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-900"
+					className="flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 				/>
 				<button
 					type="submit"
 					disabled={createMutation.isPending || !newName.trim()}
-					className="flex items-center gap-1 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+					className="flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
 				>
 					<Plus className="h-4 w-4" />
 					Create
@@ -96,7 +96,7 @@ export function WatchlistManager() {
 			</form>
 
 			{watchlists.length === 0 ? (
-				<p className="text-sm text-gray-500 dark:text-gray-400">
+				<p className="text-sm text-text-muted">
 					No watchlists yet. Create one to start tracking sponsors.
 				</p>
 			) : (
@@ -104,7 +104,7 @@ export function WatchlistManager() {
 					{watchlists.map((wl) => (
 						<div
 							key={wl.id}
-							className="rounded-lg border border-gray-200 dark:border-gray-700"
+							className="rounded-lg border border-border"
 						>
 							<div className="flex items-center justify-between p-4">
 								<button
@@ -112,21 +112,21 @@ export function WatchlistManager() {
 									onClick={() =>
 										setExpandedId(expandedId === wl.id ? null : wl.id)
 									}
-									className="text-sm font-medium hover:text-indigo-600"
+									className="text-sm font-medium hover:text-primary"
 								>
 									{wl.name}
 								</button>
 								<button
 									type="button"
 									onClick={() => deleteMutation.mutate(wl.id)}
-									className="text-gray-400 hover:text-red-500"
+									className="text-text-muted hover:text-red-500"
 									title="Delete watchlist"
 								>
 									<Trash2 className="h-4 w-4" />
 								</button>
 							</div>
 							{expandedId === wl.id && (
-								<div className="border-t border-gray-200 p-4 dark:border-gray-700">
+								<div className="border-t border-border p-4">
 									<RuleEditor watchlistId={wl.id} />
 								</div>
 							)}

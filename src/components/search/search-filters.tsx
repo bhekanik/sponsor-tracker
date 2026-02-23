@@ -26,12 +26,15 @@ export function SearchFilters({ town, rating, route }: SearchFiltersProps) {
 		[router],
 	);
 
+	const selectClass =
+		"rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+
 	return (
 		<div className="flex flex-wrap gap-3">
 			<select
 				value={rating ?? ""}
 				onChange={(e) => updateFilter("rating", e.target.value)}
-				className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+				className={selectClass}
 			>
 				<option value="">All ratings</option>
 				<option value="A rating">A rating</option>
@@ -48,13 +51,13 @@ export function SearchFilters({ town, rating, route }: SearchFiltersProps) {
 						updateFilter("town", e.currentTarget.value);
 					}
 				}}
-				className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+				className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
 			/>
 
 			<select
 				value={route ?? ""}
 				onChange={(e) => updateFilter("route", e.target.value)}
-				className="rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+				className={selectClass}
 			>
 				<option value="">All routes</option>
 				<option value="Skilled Worker">Skilled Worker</option>

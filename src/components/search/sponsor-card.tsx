@@ -22,18 +22,22 @@ export function SponsorCard({
 	status,
 	lastSeenAt,
 }: SponsorCardProps) {
+	const isActive = status === "active";
+
 	return (
 		<Link
 			href={`/sponsor/${id}`}
-			className="block rounded-lg border border-gray-200 p-4 transition-colors hover:border-indigo-300 hover:bg-gray-50 dark:border-gray-800 dark:hover:border-indigo-700 dark:hover:bg-gray-900"
+			className={`block rounded-xl bg-surface p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${
+				isActive ? "border-l-2 border-l-green-500" : ""
+			} border border-border`}
 		>
 			<div className="flex items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
-					<h3 className="truncate font-medium text-gray-900 dark:text-white">
+					<h3 className="truncate font-medium text-text-primary">
 						{canonicalName}
 					</h3>
 					{(town || county) && (
-						<p className="mt-1 flex items-center gap-1 text-sm text-gray-500">
+						<p className="mt-1 flex items-center gap-1 text-sm text-text-muted">
 							<MapPin className="h-3.5 w-3.5" />
 							{[town, county].filter(Boolean).join(", ")}
 						</p>
@@ -43,7 +47,7 @@ export function SponsorCard({
 							{routes.map((route) => (
 								<span
 									key={route}
-									className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+									className="rounded-full bg-primary-subtle px-2 py-0.5 text-xs text-primary"
 								>
 									{route}
 								</span>
@@ -57,7 +61,7 @@ export function SponsorCard({
 				</div>
 			</div>
 			{lastSeenAt && (
-				<p className="mt-2 text-xs text-gray-400">
+				<p className="mt-2 text-xs text-text-muted">
 					Last seen: {new Date(lastSeenAt).toLocaleDateString()}
 				</p>
 			)}

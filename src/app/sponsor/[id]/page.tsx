@@ -20,9 +20,14 @@ export async function generateMetadata({
 		.from(sponsors)
 		.where(eq(sponsors.id, id));
 	if (!sponsor) return { title: "Sponsor Not Found" };
+	const siteUrl =
+		process.env.NEXT_PUBLIC_SITE_URL ?? "https://sponsortracker.uk";
 	return {
 		title: `${sponsor.canonicalName}`,
 		description: `View sponsorship details and change history for ${sponsor.canonicalName}. UK Home Office Register of Licensed Sponsors.`,
+		alternates: {
+			canonical: `${siteUrl}/sponsor/${id}`,
+		},
 	};
 }
 
@@ -61,20 +66,20 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 			/>
 			<Link
 				href="/search"
-				className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+				className="mb-6 inline-flex items-center gap-1 text-sm text-text-muted transition-colors hover:text-text-primary"
 			>
 				<ArrowLeft className="h-4 w-4" />
 				Back to search
 			</Link>
 
-			<div className="rounded-xl border border-gray-200 p-6 dark:border-gray-800">
+			<div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
 				<div className="flex items-start justify-between">
 					<div>
-						<h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+						<h1 className="text-2xl font-bold text-text-primary">
 							{sponsor.canonicalName}
 						</h1>
 						{(sponsor.town || sponsor.county) && (
-							<p className="mt-1 flex items-center gap-1 text-gray-500">
+							<p className="mt-1 flex items-center gap-1 text-text-secondary">
 								<MapPin className="h-4 w-4" />
 								{[sponsor.town, sponsor.county].filter(Boolean).join(", ")}
 							</p>
@@ -104,10 +109,10 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 					</div>
 				</div>
 
-				<div className="mt-6 grid grid-cols-2 gap-4 border-t border-gray-200 pt-6 dark:border-gray-800">
+				<div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-6">
 					{sponsor.sponsorType && (
 						<div>
-							<p className="text-xs font-medium uppercase text-gray-500">
+							<p className="text-xs font-medium uppercase text-text-muted">
 								Type
 							</p>
 							<p className="mt-1 text-sm">{sponsor.sponsorType}</p>
@@ -115,14 +120,14 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 					)}
 					{sponsor.routes && sponsor.routes.length > 0 && (
 						<div>
-							<p className="text-xs font-medium uppercase text-gray-500">
+							<p className="text-xs font-medium uppercase text-text-muted">
 								Routes
 							</p>
 							<div className="mt-1 flex flex-wrap gap-1">
 								{sponsor.routes.map((route) => (
 									<span
 										key={route}
-										className="rounded-full bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800"
+										className="rounded-full bg-primary-subtle px-2 py-0.5 text-xs text-primary"
 									>
 										{route}
 									</span>
@@ -132,7 +137,7 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 					)}
 					{sponsor.firstSeenAt && (
 						<div>
-							<p className="text-xs font-medium uppercase text-gray-500">
+							<p className="text-xs font-medium uppercase text-text-muted">
 								First seen
 							</p>
 							<p className="mt-1 text-sm">
@@ -142,7 +147,7 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 					)}
 					{sponsor.lastSeenAt && (
 						<div>
-							<p className="text-xs font-medium uppercase text-gray-500">
+							<p className="text-xs font-medium uppercase text-text-muted">
 								Last seen
 							</p>
 							<p className="mt-1 text-sm">

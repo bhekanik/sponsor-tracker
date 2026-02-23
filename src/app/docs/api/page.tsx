@@ -54,37 +54,41 @@ export default function ApiDocsPage() {
 
 	return (
 		<div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-			<h1 className="text-2xl font-bold">API Documentation</h1>
-			<p className="mt-2 text-gray-600 dark:text-gray-400">
+			<h1 className="font-display text-3xl text-text-primary">
+				API Documentation
+			</h1>
+			<p className="mt-2 text-text-secondary">
 				RESTful API for searching sponsors, checking status, and streaming
 				changes. All endpoints require an API key.
 			</p>
 
-			<div className="mt-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
-				<h2 className="text-sm font-semibold">Authentication</h2>
-				<p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+			<div className="mt-6 rounded-xl border border-border bg-surface-raised p-4">
+				<h2 className="text-sm font-semibold text-text-primary">
+					Authentication
+				</h2>
+				<p className="mt-1 text-sm text-text-secondary">
 					Include your API key in the Authorization header:
 				</p>
-				<pre className="mt-2 overflow-x-auto text-xs">
+				<pre className="mt-2 overflow-x-auto text-xs text-text-primary">
 					Authorization: Bearer st_your_api_key_here
 				</pre>
 			</div>
 
-			<div className="mt-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
-				<h2 className="text-sm font-semibold">Rate Limits</h2>
-				<ul className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+			<div className="mt-4 rounded-xl border border-border bg-surface-raised p-4">
+				<h2 className="text-sm font-semibold text-text-primary">Rate Limits</h2>
+				<ul className="mt-2 space-y-1 text-sm text-text-secondary">
 					<li>Free: 100 requests/day</li>
 					<li>Pro: 1,000 requests/day</li>
 					<li>Business: 10,000 requests/day + bulk endpoints</li>
 				</ul>
 			</div>
 
-			<h2 className="mt-8 text-lg font-bold">Endpoints</h2>
+			<h2 className="mt-8 font-display text-xl text-text-primary">Endpoints</h2>
 			<div className="mt-4 space-y-4">
 				{endpoints.map((ep) => (
 					<div
 						key={`${ep.method}-${ep.path}`}
-						className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+						className="rounded-xl border border-border bg-surface p-4"
 					>
 						<div className="flex items-center gap-2">
 							<span
@@ -96,13 +100,13 @@ export default function ApiDocsPage() {
 							>
 								{ep.method}
 							</span>
-							<code className="text-sm">{ep.path}</code>
+							<code className="text-sm text-text-primary">{ep.path}</code>
 						</div>
-						<p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+						<p className="mt-1 text-sm text-text-secondary">
 							{ep.description}
 						</p>
 						{ep.params && (
-							<p className="mt-1 text-xs text-gray-500">
+							<p className="mt-1 text-xs text-text-muted">
 								Parameters: {ep.params}
 							</p>
 						)}

@@ -9,7 +9,7 @@ const plans = [
 	{
 		id: "free",
 		name: "Free",
-		price: "£0",
+		price: "\u00a30",
 		period: "forever",
 		features: [
 			"Search & company pages",
@@ -24,7 +24,7 @@ const plans = [
 	{
 		id: "pro",
 		name: "Pro",
-		price: "£6",
+		price: "\u00a36",
 		period: "/month",
 		features: [
 			"10 watchlists, 50 rules",
@@ -39,7 +39,7 @@ const plans = [
 	{
 		id: "business",
 		name: "Business",
-		price: "£49",
+		price: "\u00a349",
 		period: "/month",
 		features: [
 			"Unlimited watchlists",
@@ -91,46 +91,81 @@ export function PricingCards() {
 
 	return (
 		<div className="grid gap-6 md:grid-cols-3">
-			{plans.map((plan) => (
+			{plans.map((plan, i) => (
 				<div
 					key={plan.id}
-					className={`rounded-xl border p-6 ${
-						plan.highlighted
-							? "border-indigo-600 ring-2 ring-indigo-600"
-							: "border-gray-200 dark:border-gray-700"
-					}`}
+					className="animate-fade-up"
+					style={{ animationDelay: `${i * 100}ms` }}
 				>
-					<h3 className="text-lg font-bold">{plan.name}</h3>
-					<div className="mt-2">
-						<span className="text-3xl font-bold">{plan.price}</span>
-						<span className="text-sm text-gray-500">{plan.period}</span>
-					</div>
-					<ul className="mt-6 space-y-3">
-						{plan.features.map((feature) => (
-							<li key={feature} className="flex items-start gap-2 text-sm">
-								<Check className="mt-0.5 h-4 w-4 shrink-0 text-indigo-600" />
-								{feature}
-							</li>
-						))}
-					</ul>
-					<button
-						type="button"
-						onClick={() => handleSubscribe(plan.id)}
-						disabled={loading === plan.id}
-						className={`mt-6 w-full rounded-md px-4 py-2 text-sm font-medium ${
-							plan.highlighted
-								? "bg-indigo-600 text-white hover:bg-indigo-500"
-								: "border border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
-						} disabled:opacity-50`}
-					>
-						{loading === plan.id
-							? "Redirecting..."
-							: plan.href
-								? plan.cta
-								: plan.cta}
-					</button>
+					{plan.highlighted ? (
+						<div className="rounded-2xl bg-gradient-to-br from-primary to-accent p-px">
+							<div className="relative rounded-2xl bg-surface p-8">
+								<span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-0.5 text-xs font-semibold text-gray-900">
+									Most popular
+								</span>
+								<PlanContent
+									plan={plan}
+									loading={loading}
+									onSubscribe={handleSubscribe}
+								/>
+							</div>
+						</div>
+					) : (
+						<div className="rounded-2xl border border-border bg-surface p-8">
+							<PlanContent
+								plan={plan}
+								loading={loading}
+								onSubscribe={handleSubscribe}
+							/>
+						</div>
+					)}
 				</div>
 			))}
 		</div>
+	);
+}
+
+function PlanContent({
+	plan,
+	loading,
+	onSubscribe,
+}: {
+	plan: (typeof plans)[number];
+	loading: string | null;
+	onSubscribe: (id: string) => void;
+}) {
+	return (
+		<>
+			<h3 className="text-lg font-bold text-text-primary">{plan.name}</h3>
+			<div className="mt-2">
+				<span className="font-display text-5xl text-text-primary">
+					{plan.price}
+				</span>
+				<span className="text-sm text-text-secondary">{plan.period}</span>
+			</div>
+			<ul className="mt-6 space-y-3">
+				{plan.features.map((feature) => (
+					<li
+						key={feature}
+						className="flex items-start gap-2 text-sm text-text-secondary"
+					>
+						<Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+						{feature}
+					</li>
+				))}
+			</ul>
+			<button
+				type="button"
+				onClick={() => onSubscribe(plan.id)}
+				disabled={loading === plan.id}
+				className={`mt-6 w-full rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
+					plan.highlighted
+						? "bg-primary text-white hover:bg-primary-hover"
+						: "border border-border text-text-primary hover:bg-surface-raised"
+				} disabled:opacity-50`}
+			>
+				{loading === plan.id ? "Redirecting..." : plan.cta}
+			</button>
+		</>
 	);
 }
