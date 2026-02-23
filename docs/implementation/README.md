@@ -8,7 +8,7 @@
 | [Phase 2](./phase-02-ingestion.md) | COMPLETE | CSV Ingestion & Diff Engine |
 | [Phase 3](./phase-03-search.md) | COMPLETE | Search |
 | [Phase 4](./phase-04-auth.md) | COMPLETE | Auth & User Accounts |
-| [Phase 5](./phase-05-watchlists.md) | PENDING | Watchlists & Rules |
+| [Phase 5](./phase-05-watchlists.md) | COMPLETE | Watchlists & Rules |
 | [Phase 6](./phase-06-notifications.md) | PENDING | Notifications & Alerts |
 | [Phase 7](./phase-07-api.md) | PENDING | API |
 | [Phase 8](./phase-08-polling.md) | PENDING | Scheduled Polling |
