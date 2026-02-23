@@ -8,10 +8,7 @@ const publicPaths = [
 	"/pricing",
 	"/about",
 	"/auth",
-	"/api/auth",
-	"/api/search",
-	"/api/sponsors",
-	"/api/changes",
+	"/api",
 	"/docs",
 ];
 

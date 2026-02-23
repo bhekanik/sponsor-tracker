@@ -27,6 +27,10 @@ describe("middleware", () => {
 			"/api/search",
 			"/api/sponsors/123",
 			"/api/changes",
+			"/api/v1/sponsors/search",
+			"/api/keys",
+			"/api/watchlists",
+			"/api/notifications",
 			"/docs/api",
 		];
 
