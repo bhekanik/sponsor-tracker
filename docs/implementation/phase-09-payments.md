@@ -1,23 +1,23 @@
 # Phase 9: Payments
 
-## Status: PENDING
+## Status: COMPLETE
 
 ## Tasks
 
-- [ ] Install Stripe SDK
-- [ ] Create Stripe products/prices config
-- [ ] Create pricing page (`/pricing`) with plan comparison
-- [ ] Create Stripe checkout session endpoint
-- [ ] Create Stripe webhook handler (`/api/stripe/webhook`)
-- [ ] Handle subscription events: created, updated, deleted
-- [ ] Update user plan on subscription changes
-- [ ] Create billing portal link for existing subscribers
-- [ ] Enforce plan limits: watchlists, API rate limits, features
-- [ ] Create pricing cards component
-- [ ] Write tests: checkout creates subscription
-- [ ] Write tests: webhook updates user plan
-- [ ] Write tests: plan limits enforced across features
-- [ ] Verify: can subscribe, plan limits enforced
+- [x] Install Stripe SDK
+- [x] Create Stripe products/prices config
+- [x] Create pricing page (`/pricing`) with plan comparison
+- [x] Create Stripe checkout session endpoint
+- [x] Create Stripe webhook handler (`/api/stripe/webhook`)
+- [x] Handle subscription events: created, updated, deleted
+- [x] Update user plan on subscription changes
+- [x] Create billing portal link for existing subscribers
+- [x] Enforce plan limits: watchlists, API rate limits, features
+- [x] Create pricing cards component
+- [x] Write tests: checkout creates subscription
+- [x] Write tests: webhook updates user plan
+- [x] Write tests: plan limits enforced across features
+- [x] Verify: can subscribe, plan limits enforced
 
 ## Acceptance Criteria
 
