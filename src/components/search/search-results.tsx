@@ -1,135 +1,274 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import {
+	type ColumnDef,
+	getCoreRowModel,
+	getSortedRowModel,
+	type SortingState,
+	useReactTable,
+} from "@tanstack/react-table";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
+import { useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { DataTable } from "@/components/ui/data-table";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { DataTableToolbar } from "@/components/ui/data-table-toolbar";
+import { formatSponsorName, formatTown } from "@/lib/format";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 import { SponsorCard } from "./sponsor-card";
 
-interface SearchResultsProps {
-	q: string;
-	town?: string;
-	county?: string;
-	route?: string;
-	rating?: string;
+interface Sponsor {
+	id: string;
+	canonicalName: string;
+	town: string | null;
+	county: string | null;
+	rating: string | null;
+	routes: string[] | null;
+	status: string;
+	lastSeenAt: string | null;
+	firstSeenAt: string | null;
+}
+
+interface SearchResponse {
+	data: Sponsor[];
+	total: number;
 	page: number;
+	pageSize: number;
 }
 
-async function fetchResults(params: SearchResultsProps) {
-	const searchParams = new URLSearchParams();
-	if (params.q) searchParams.set("q", params.q);
-	if (params.town) searchParams.set("town", params.town);
-	if (params.county) searchParams.set("county", params.county);
-	if (params.route) searchParams.set("route", params.route);
-	if (params.rating) searchParams.set("rating", params.rating);
-	searchParams.set("page", String(params.page));
-	searchParams.set("limit", "20");
+const columns: ColumnDef<Sponsor>[] = [
+	{
+		accessorKey: "canonicalName",
+		header: "Organisation",
+		enableHiding: false,
+		cell: ({ row }) => (
+			<Link
+				href={`/sponsor/${row.original.id}`}
+				className="font-medium text-text-primary hover:text-primary transition-colors"
+				onClick={(e) => e.stopPropagation()}
+			>
+				{formatSponsorName(row.getValue("canonicalName"))}
+			</Link>
+		),
+	},
+	{
+		accessorKey: "town",
+		header: "Town",
+		meta: { className: "hidden lg:table-cell" },
+		cell: ({ getValue }) => {
+			const town = getValue<string | null>();
+			return town ? formatTown(town) : "\u2014";
+		},
+	},
+	{
+		accessorKey: "county",
+		header: "County",
+		meta: { className: "hidden xl:table-cell" },
+		cell: ({ getValue }) => {
+			const county = getValue<string | null>();
+			return county ? formatTown(county) : "\u2014";
+		},
+	},
+	{
+		accessorKey: "rating",
+		header: "Rating",
+		enableHiding: false,
+		cell: ({ getValue }) => {
+			const rating = getValue<string | null>();
+			if (!rating) return "\u2014";
+			const variant = rating.includes("A") ? "info" : "warning";
+			return <Badge variant={variant}>{rating}</Badge>;
+		},
+	},
+	{
+		accessorKey: "routes",
+		header: "Routes",
+		enableSorting: false,
+		meta: { className: "hidden lg:table-cell" },
+		cell: ({ getValue }) => {
+			const routes = getValue<string[] | null>();
+			if (!routes?.length) return "\u2014";
+			const display = routes.slice(0, 2);
+			const remaining = routes.length - 2;
+			return (
+				<div className="flex flex-wrap gap-1">
+					{display.map((r) => (
+						<span
+							key={r}
+							className="rounded-full bg-primary-subtle px-2 py-0.5 text-xs text-primary"
+						>
+							{r}
+						</span>
+					))}
+					{remaining > 0 && (
+						<span className="rounded-full bg-surface-raised px-2 py-0.5 text-xs text-text-muted">
+							+{remaining}
+						</span>
+					)}
+				</div>
+			);
+		},
+	},
+	{
+		accessorKey: "status",
+		header: "Status",
+		enableHiding: false,
+		cell: ({ getValue }) => {
+			const status = getValue<string>();
+			const variant = status === "active" ? "success" : "danger";
+			return <Badge variant={variant}>{status}</Badge>;
+		},
+	},
+	{
+		accessorKey: "lastSeenAt",
+		header: "Last Seen",
+		meta: { className: "hidden md:table-cell" },
+		cell: ({ getValue }) => {
+			const date = getValue<string | null>();
+			if (!date) return "\u2014";
+			return relativeDate(new Date(date));
+		},
+	},
+];
 
-	const res = await fetch(`/api/search?${searchParams.toString()}`);
-	if (!res.ok) throw new Error("Search failed");
-	return res.json();
+function relativeDate(date: Date): string {
+	const now = new Date();
+	const diff = now.getTime() - date.getTime();
+	const days = Math.floor(diff / 86400000);
+	if (days === 0) return "Today";
+	if (days === 1) return "Yesterday";
+	if (days < 30) return `${days}d ago`;
+	if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+	return date.toLocaleDateString();
 }
 
-export function SearchResults(props: SearchResultsProps) {
-	const { data, isLoading, error } = useQuery({
-		queryKey: ["search", props],
-		queryFn: () => fetchResults(props),
+export function SearchResults() {
+	const router = useRouter();
+	const isMobile = useMediaQuery("(max-width: 767px)");
+
+	const [params, setParams] = useQueryStates({
+		q: parseAsString.withDefault(""),
+		page: parseAsInteger.withDefault(1),
+		pageSize: parseAsInteger.withDefault(20),
+		view: parseAsStringLiteral(["table", "card"] as const).withDefault("table"),
+		rating: parseAsString,
+		route: parseAsString,
+		town: parseAsString,
+		status: parseAsString,
 	});
 
+	const effectiveView = isMobile ? "card" : params.view;
+
+	const { data, isLoading } = useQuery<SearchResponse>({
+		queryKey: ["search", params],
+		queryFn: async () => {
+			const sp = new URLSearchParams();
+			if (params.q) sp.set("q", params.q);
+			if (params.town) sp.set("town", params.town);
+			if (params.route) sp.set("route", params.route);
+			if (params.rating) sp.set("rating", params.rating);
+			if (params.status) sp.set("status", params.status);
+			sp.set("page", String(params.page));
+			sp.set("limit", String(params.pageSize));
+
+			const res = await fetch(`/api/search?${sp.toString()}`);
+			if (!res.ok) throw new Error("Search failed");
+			return res.json();
+		},
+		placeholderData: keepPreviousData,
+	});
+
+	const [sorting, setSorting] = useState<SortingState>([]);
+
+	const table = useReactTable({
+		data: data?.data ?? [],
+		columns,
+		state: { sorting },
+		onSortingChange: setSorting,
+		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		manualPagination: true,
+		pageCount: data ? Math.ceil(data.total / params.pageSize) : -1,
+	});
+
+	const total = data?.total ?? 0;
+
+	return (
+		<div className="flex flex-1 flex-col overflow-hidden">
+			<DataTableToolbar
+				table={table}
+				total={total}
+				view={effectiveView}
+				onViewChange={(v) => setParams({ view: v })}
+			/>
+
+			<div className="flex-1 overflow-y-auto">
+				{effectiveView === "table" ? (
+					<DataTable
+						table={table}
+						isLoading={isLoading}
+						onRowClick={(row) => router.push(`/sponsor/${row.id}`)}
+					/>
+				) : (
+					<CardGrid
+						sponsors={data?.data ?? []}
+						isLoading={isLoading}
+						query={params.q}
+					/>
+				)}
+			</div>
+
+			<div className="shrink-0">
+				<DataTablePagination
+					page={params.page}
+					pageSize={params.pageSize}
+					total={total}
+					onPageChange={(p) => setParams({ page: p })}
+					onPageSizeChange={(s) => setParams({ pageSize: s, page: 1 })}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function CardGrid({
+	sponsors,
+	isLoading,
+	query,
+}: {
+	sponsors: Sponsor[];
+	isLoading: boolean;
+	query: string;
+}) {
 	if (isLoading) {
 		return (
-			<div className="space-y-4">
-				{Array.from({ length: 5 }).map((_, i) => (
+			<div className="grid gap-3 p-1 sm:grid-cols-2 lg:grid-cols-3">
+				{Array.from({ length: 6 }).map((_, i) => (
 					<div
-						key={`skeleton-${i}`}
-						className="h-24 animate-pulse rounded-xl bg-surface-raised"
+						key={`skel-${i}`}
+						className="h-32 animate-pulse rounded-xl bg-surface-raised"
 					/>
 				))}
 			</div>
 		);
 	}
 
-	if (error) {
+	if (sponsors.length === 0) {
 		return (
-			<p className="text-sm text-red-600">Search failed. Please try again.</p>
-		);
-	}
-
-	if (!data?.data?.length) {
-		return (
-			<p className="text-sm text-text-muted">
-				{props.q
-					? `No sponsors found matching "${props.q}"`
-					: "No sponsors found"}
-			</p>
-		);
-	}
-
-	return (
-		<div>
-			<p className="mb-4 text-sm text-text-secondary">
-				{data.total.toLocaleString()} sponsor{data.total !== 1 ? "s" : ""} found
-			</p>
-			<div className="space-y-3">
-				{data.data.map(
-					(
-						sponsor: {
-							id: string;
-							canonicalName: string;
-							town: string | null;
-							county: string | null;
-							rating: string | null;
-							routes: string[] | null;
-							status: string;
-							lastSeenAt: string | null;
-						},
-						i: number,
-					) => (
-						<div
-							key={sponsor.id}
-							className="animate-fade-up"
-							style={{ animationDelay: `${i * 50}ms` }}
-						>
-							<SponsorCard {...sponsor} />
-						</div>
-					),
-				)}
+			<div className="flex items-center justify-center py-16 text-sm text-text-muted">
+				{query ? `No sponsors found matching "${query}"` : "No sponsors found"}
 			</div>
-			{data.total > 20 && (
-				<Pagination
-					currentPage={props.page}
-					totalPages={Math.ceil(data.total / 20)}
-				/>
-			)}
-		</div>
-	);
-}
+		);
+	}
 
-function Pagination({
-	currentPage,
-	totalPages,
-}: {
-	currentPage: number;
-	totalPages: number;
-}) {
 	return (
-		<div className="mt-6 flex items-center justify-center gap-2">
-			{currentPage > 1 && (
-				<a
-					href={`?page=${currentPage - 1}`}
-					className="rounded-lg border border-border px-3 py-1 text-sm text-text-primary transition-colors hover:bg-surface-raised"
-				>
-					Previous
-				</a>
-			)}
-			<span className="text-sm text-text-secondary">
-				Page {currentPage} of {totalPages}
-			</span>
-			{currentPage < totalPages && (
-				<a
-					href={`?page=${currentPage + 1}`}
-					className="rounded-lg border border-border px-3 py-1 text-sm text-text-primary transition-colors hover:bg-surface-raised"
-				>
-					Next
-				</a>
-			)}
+		<div className="grid gap-3 p-1 sm:grid-cols-2 lg:grid-cols-3">
+			{sponsors.map((sponsor) => (
+				<SponsorCard key={sponsor.id} {...sponsor} />
+			))}
 		</div>
 	);
 }

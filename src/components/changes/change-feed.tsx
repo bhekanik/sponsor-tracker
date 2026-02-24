@@ -1,9 +1,18 @@
 "use client";
 
+import {
+	type ColumnDef,
+	getCoreRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Minus, Plus, RefreshCw } from "lucide-react";
+import { ArrowRight, LayoutGrid, Minus, Plus, RefreshCw, Table2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { DataTable } from "@/components/ui/data-table";
+import { formatSponsorName, formatTown } from "@/lib/format";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 interface Change {
 	id: string;
@@ -19,25 +28,28 @@ interface Change {
 
 const TYPE_CONFIG: Record<
 	string,
-	{ icon: typeof Plus; label: string; color: string; border: string }
+	{ icon: typeof Plus; label: string; color: string; border: string; variant: "success" | "danger" | "warning" }
 > = {
 	added: {
 		icon: Plus,
 		label: "Added",
 		color: "text-green-600 bg-green-50 dark:bg-green-900/20",
 		border: "border-l-green-500",
+		variant: "success",
 	},
 	removed: {
 		icon: Minus,
 		label: "Removed",
 		color: "text-red-600 bg-red-50 dark:bg-red-900/20",
 		border: "border-l-red-500",
+		variant: "danger",
 	},
 	updated: {
 		icon: RefreshCw,
 		label: "Updated",
 		color: "text-amber-600 bg-amber-50 dark:bg-amber-900/20",
 		border: "border-l-amber-500",
+		variant: "warning",
 	},
 };
 
@@ -48,8 +60,62 @@ const filterOptions = [
 	{ value: "updated", label: "Updated" },
 ];
 
+const columns: ColumnDef<Change>[] = [
+	{
+		accessorKey: "sponsorName",
+		header: "Sponsor",
+		cell: ({ row }) => (
+			<Link
+				href={`/sponsor/${row.original.sponsorId}`}
+				className="font-medium text-text-primary hover:text-primary transition-colors"
+			>
+				{formatSponsorName(row.getValue("sponsorName"))}
+			</Link>
+		),
+	},
+	{
+		accessorKey: "changeType",
+		header: "Type",
+		cell: ({ getValue }) => {
+			const type = getValue<string>();
+			const config = TYPE_CONFIG[type] ?? TYPE_CONFIG.updated;
+			return <Badge variant={config.variant}>{config.label}</Badge>;
+		},
+	},
+	{
+		accessorKey: "field",
+		header: "Field",
+		meta: { className: "hidden md:table-cell" },
+		cell: ({ getValue }) => getValue<string | null>() ?? "\u2014",
+	},
+	{
+		id: "values",
+		header: "Change",
+		meta: { className: "hidden lg:table-cell" },
+		cell: ({ row }) => {
+			if (!row.original.field) return "\u2014";
+			return (
+				<span className="text-xs">
+					<span className="text-red-500">{row.original.oldValue ?? "\u2014"}</span>
+					<ArrowRight className="mx-1 inline h-3 w-3 text-text-muted" />
+					<span className="text-green-600">{row.original.newValue ?? "\u2014"}</span>
+				</span>
+			);
+		},
+	},
+	{
+		accessorKey: "createdAt",
+		header: "Date",
+		cell: ({ getValue }) =>
+			new Date(getValue<string>()).toLocaleDateString(),
+	},
+];
+
 export function ChangeFeed() {
 	const [filter, setFilter] = useState<string>("");
+	const [view, setView] = useState<"table" | "card">("card");
+	const isMobile = useMediaQuery("(max-width: 767px)");
+	const effectiveView = isMobile ? "card" : view;
 
 	const { data: changes = [], isLoading } = useQuery<Change[]>({
 		queryKey: ["changes", filter],
@@ -60,24 +126,60 @@ export function ChangeFeed() {
 		},
 	});
 
+	const table = useReactTable({
+		data: changes,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+	});
+
 	return (
 		<div className="space-y-4">
-			{/* Segmented control */}
-			<div className="inline-flex rounded-lg bg-surface-raised p-1 shadow-sm">
-				{filterOptions.map((opt) => (
+			<div className="flex items-center justify-between">
+				{/* Segmented control */}
+				<div className="inline-flex rounded-lg bg-surface-raised p-1 shadow-sm">
+					{filterOptions.map((opt) => (
+						<button
+							key={opt.value}
+							type="button"
+							onClick={() => setFilter(opt.value)}
+							className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+								filter === opt.value
+									? "bg-surface text-text-primary shadow-sm"
+									: "text-text-secondary hover:text-text-primary"
+							}`}
+						>
+							{opt.label}
+						</button>
+					))}
+				</div>
+
+				{/* View toggle */}
+				<div className="inline-flex rounded-lg border border-border p-0.5">
 					<button
-						key={opt.value}
 						type="button"
-						onClick={() => setFilter(opt.value)}
-						className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
-							filter === opt.value
-								? "bg-surface text-text-primary shadow-sm"
-								: "text-text-secondary hover:text-text-primary"
+						onClick={() => setView("table")}
+						className={`rounded-md p-1.5 transition-colors ${
+							effectiveView === "table"
+								? "bg-surface-raised text-text-primary"
+								: "text-text-muted hover:text-text-primary"
 						}`}
+						aria-label="Table view"
 					>
-						{opt.label}
+						<Table2 className="h-4 w-4" />
 					</button>
-				))}
+					<button
+						type="button"
+						onClick={() => setView("card")}
+						className={`rounded-md p-1.5 transition-colors ${
+							effectiveView === "card"
+								? "bg-surface-raised text-text-primary"
+								: "text-text-muted hover:text-text-primary"
+						}`}
+						aria-label="Card view"
+					>
+						<LayoutGrid className="h-4 w-4" />
+					</button>
+				</div>
 			</div>
 
 			{isLoading ? (
@@ -94,17 +196,20 @@ export function ChangeFeed() {
 					No changes recorded yet. Changes will appear here after the next CSV
 					poll.
 				</p>
+			) : effectiveView === "table" ? (
+				<div className="overflow-x-auto rounded-lg border border-border">
+					<DataTable table={table} />
+				</div>
 			) : (
 				<div className="space-y-2">
-					{changes.map((change, i) => {
+					{changes.map((change) => {
 						const config =
 							TYPE_CONFIG[change.changeType] ?? TYPE_CONFIG.updated;
 						const Icon = config.icon;
 						return (
 							<div
 								key={change.id}
-								className={`flex items-start gap-3 rounded-lg border border-border border-l-2 ${config.border} bg-surface p-3 animate-fade-up`}
-								style={{ animationDelay: `${i * 50}ms` }}
+								className={`flex items-start gap-3 rounded-lg border border-border border-l-2 ${config.border} bg-surface p-3`}
 							>
 								<div className={`mt-0.5 rounded-full p-1.5 ${config.color}`}>
 									<Icon className="h-3.5 w-3.5" />
@@ -114,11 +219,11 @@ export function ChangeFeed() {
 										href={`/sponsor/${change.sponsorId}`}
 										className="text-sm font-medium text-text-primary transition-colors hover:text-primary"
 									>
-										{change.sponsorName}
+										{formatSponsorName(change.sponsorName)}
 									</Link>
 									{change.town && (
 										<span className="ml-2 text-xs text-text-muted">
-											{change.town}
+											{formatTown(change.town)}
 										</span>
 									)}
 									<p className="text-xs text-text-secondary">

@@ -18,7 +18,9 @@
 	},
 	"dependencies": {
 		"@tanstack/react-query": "^5.90.21",
+		"@tanstack/react-table": "^8.21.3",
 		"better-auth": "^1.4.19",
+		"change-case": "^5.4.4",
 		"clsx": "^2.1.1",
 		"csv-parse": "^6.1.0",
 		"drizzle-orm": "^0.45.1",

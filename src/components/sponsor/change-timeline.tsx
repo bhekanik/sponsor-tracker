@@ -45,11 +45,10 @@ export function ChangeTimeline({ sponsorId }: { sponsorId: string }) {
 		<div className="relative space-y-3 pl-4">
 			{/* Vertical connecting line */}
 			<div className="absolute left-[1.1rem] top-2 bottom-2 w-px bg-border-muted" />
-			{data.map((event, i) => (
+			{data.map((event) => (
 				<div
 					key={event.id}
-					className="relative flex items-start gap-3 rounded-lg border border-border bg-surface p-3 animate-fade-up"
-					style={{ animationDelay: `${i * 75}ms` }}
+					className="relative flex items-start gap-3 rounded-lg border border-border bg-surface p-3"
 				>
 					<ChangeIcon type={event.changeType} />
 					<div className="min-w-0 flex-1">

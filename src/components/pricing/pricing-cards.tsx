@@ -91,12 +91,8 @@ export function PricingCards() {
 
 	return (
 		<div className="grid gap-6 md:grid-cols-3">
-			{plans.map((plan, i) => (
-				<div
-					key={plan.id}
-					className="animate-fade-up"
-					style={{ animationDelay: `${i * 100}ms` }}
-				>
+			{plans.map((plan) => (
+				<div key={plan.id}>
 					{plan.highlighted ? (
 						<div className="rounded-2xl bg-gradient-to-br from-primary to-accent p-px">
 							<div className="relative rounded-2xl bg-surface p-8">
