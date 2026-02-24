@@ -30,6 +30,14 @@ export function Footer() {
 						>
 							API
 						</Link>
+						<a
+							href="https://github.com/bhekanik/sponsor-tracker"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-sm text-text-muted transition-colors hover:text-text-primary"
+						>
+							GitHub
+						</a>
 					</div>
 				</div>
 			</div>
