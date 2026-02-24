@@ -1,4 +1,4 @@
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, count, eq, gte, sql } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { changes, changesets, sponsors } from "@/db/schema";
@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
 	const { searchParams } = request.nextUrl;
 	const since = searchParams.get("since");
 	const type = searchParams.get("type");
-	const limit = Math.min(Number(searchParams.get("limit") ?? "50"), 200);
+	const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
+	const pageSize = Math.min(Math.max(1, Number(searchParams.get("pageSize") ?? "20")), 200);
 
 	const conditions = [];
 	if (since) {
@@ -17,7 +18,9 @@ export async function GET(request: NextRequest) {
 		conditions.push(eq(changes.changeType, type));
 	}
 
-	const rows = await db
+	const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+	const baseQuery = db
 		.select({
 			id: changes.id,
 			changeType: changes.changeType,
@@ -32,10 +35,22 @@ export async function GET(request: NextRequest) {
 		})
 		.from(changes)
 		.innerJoin(changesets, eq(changes.changesetId, changesets.id))
-		.innerJoin(sponsors, eq(changes.sponsorId, sponsors.id))
-		.where(conditions.length > 0 ? and(...conditions) : undefined)
-		.orderBy(sql`${changesets.createdAt} DESC`)
-		.limit(limit);
+		.innerJoin(sponsors, eq(changes.sponsorId, sponsors.id));
 
-	return NextResponse.json(rows);
+	const countQuery = db
+		.select({ total: count() })
+		.from(changes)
+		.innerJoin(changesets, eq(changes.changesetId, changesets.id))
+		.innerJoin(sponsors, eq(changes.sponsorId, sponsors.id));
+
+	const [rows, [{ total }]] = await Promise.all([
+		baseQuery
+			.where(where)
+			.orderBy(sql`${changesets.createdAt} DESC`)
+			.limit(pageSize)
+			.offset((page - 1) * pageSize),
+		countQuery.where(where),
+	]);
+
+	return NextResponse.json({ data: rows, total, page, pageSize });
 }

@@ -65,10 +65,11 @@ export default function DashboardPage() {
 		Change[]
 	>({
 		queryKey: ["changes-7d"],
-		queryFn: () =>
-			fetch(`/api/changes?since=${sevenDaysAgo}&limit=50`).then((r) =>
-				r.json(),
-			),
+		queryFn: async () => {
+			const res = await fetch(`/api/changes?since=${sevenDaysAgo}&pageSize=50`);
+			const json = await res.json();
+			return json.data;
+		},
 	});
 
 	return (

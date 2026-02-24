@@ -3,14 +3,19 @@
 import {
 	type ColumnDef,
 	getCoreRowModel,
+	getSortedRowModel,
+	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, LayoutGrid, Minus, Plus, RefreshCw, Table2 } from "lucide-react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { ArrowRight, Minus, Plus, RefreshCw, X } from "lucide-react";
 import Link from "next/link";
+import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { DataTableToolbar } from "@/components/ui/data-table-toolbar";
 import { formatSponsorName, formatTown } from "@/lib/format";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
@@ -24,6 +29,13 @@ interface Change {
 	sponsorName: string;
 	town: string | null;
 	createdAt: string;
+}
+
+interface ChangesResponse {
+	data: Change[];
+	total: number;
+	page: number;
+	pageSize: number;
 }
 
 const TYPE_CONFIG: Record<
@@ -64,6 +76,7 @@ const columns: ColumnDef<Change>[] = [
 	{
 		accessorKey: "sponsorName",
 		header: "Sponsor",
+		enableHiding: false,
 		cell: ({ row }) => (
 			<Link
 				href={`/sponsor/${row.original.sponsorId}`}
@@ -76,6 +89,7 @@ const columns: ColumnDef<Change>[] = [
 	{
 		accessorKey: "changeType",
 		header: "Type",
+		enableHiding: false,
 		cell: ({ getValue }) => {
 			const type = getValue<string>();
 			const config = TYPE_CONFIG[type] ?? TYPE_CONFIG.updated;
@@ -91,6 +105,7 @@ const columns: ColumnDef<Change>[] = [
 	{
 		id: "values",
 		header: "Change",
+		enableSorting: false,
 		meta: { className: "hidden lg:table-cell" },
 		cell: ({ row }) => {
 			if (!row.original.field) return "\u2014";
@@ -112,145 +127,189 @@ const columns: ColumnDef<Change>[] = [
 ];
 
 export function ChangeFeed() {
-	const [filter, setFilter] = useState<string>("");
-	const [view, setView] = useState<"table" | "card">("card");
 	const isMobile = useMediaQuery("(max-width: 767px)");
-	const effectiveView = isMobile ? "card" : view;
 
-	const { data: changes = [], isLoading } = useQuery<Change[]>({
-		queryKey: ["changes", filter],
-		queryFn: () => {
-			const params = new URLSearchParams();
-			if (filter) params.set("type", filter);
-			return fetch(`/api/changes?${params}`).then((r) => r.json());
-		},
+	const [params, setParams] = useQueryStates({
+		type: parseAsString,
+		page: parseAsInteger.withDefault(1),
+		pageSize: parseAsInteger.withDefault(20),
+		view: parseAsStringLiteral(["table", "card"] as const).withDefault("card"),
 	});
+
+	const effectiveView = isMobile ? "card" : params.view;
+
+	const { data, isLoading } = useQuery<ChangesResponse>({
+		queryKey: ["changes", params],
+		queryFn: async () => {
+			const sp = new URLSearchParams();
+			if (params.type) sp.set("type", params.type);
+			sp.set("page", String(params.page));
+			sp.set("pageSize", String(params.pageSize));
+			const res = await fetch(`/api/changes?${sp.toString()}`);
+			if (!res.ok) throw new Error("Failed to fetch changes");
+			return res.json();
+		},
+		placeholderData: keepPreviousData,
+	});
+
+	const [sorting, setSorting] = useState<SortingState>([]);
 
 	const table = useReactTable({
-		data: changes,
+		data: data?.data ?? [],
 		columns,
+		state: { sorting },
+		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		manualPagination: true,
+		pageCount: data ? Math.ceil(data.total / params.pageSize) : -1,
 	});
 
+	const total = data?.total ?? 0;
+
 	return (
-		<div className="space-y-4">
-			<div className="flex items-center justify-between">
-				{/* Segmented control */}
-				<div className="inline-flex rounded-lg bg-surface-raised p-1 shadow-sm">
-					{filterOptions.map((opt) => (
+		<div className="flex flex-1 flex-col overflow-hidden">
+			{/* Filter bar + toolbar */}
+			<div className="shrink-0 space-y-2">
+				<div className="flex items-center gap-3 flex-wrap">
+					{/* Segmented control */}
+					<div className="inline-flex rounded-lg bg-surface-raised p-1 shadow-sm">
+						{filterOptions.map((opt) => (
+							<button
+								key={opt.value}
+								type="button"
+								onClick={() => setParams({ type: opt.value || null, page: 1 })}
+								className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+									(params.type ?? "") === opt.value
+										? "bg-surface text-text-primary shadow-sm"
+										: "text-text-secondary hover:text-text-primary"
+								}`}
+							>
+								{opt.label}
+							</button>
+						))}
+					</div>
+
+					{/* Active filter chip */}
+					{params.type && (
 						<button
-							key={opt.value}
 							type="button"
-							onClick={() => setFilter(opt.value)}
-							className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
-								filter === opt.value
-									? "bg-surface text-text-primary shadow-sm"
-									: "text-text-secondary hover:text-text-primary"
-							}`}
+							onClick={() => setParams({ type: null, page: 1 })}
+							className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-1 text-xs text-text-secondary transition-colors hover:bg-surface-raised"
 						>
-							{opt.label}
+							Type: {params.type}
+							<X className="h-3 w-3" />
 						</button>
-					))}
+					)}
 				</div>
 
-				{/* View toggle */}
-				<div className="inline-flex rounded-lg border border-border p-0.5">
-					<button
-						type="button"
-						onClick={() => setView("table")}
-						className={`rounded-md p-1.5 transition-colors ${
-							effectiveView === "table"
-								? "bg-surface-raised text-text-primary"
-								: "text-text-muted hover:text-text-primary"
-						}`}
-						aria-label="Table view"
-					>
-						<Table2 className="h-4 w-4" />
-					</button>
-					<button
-						type="button"
-						onClick={() => setView("card")}
-						className={`rounded-md p-1.5 transition-colors ${
-							effectiveView === "card"
-								? "bg-surface-raised text-text-primary"
-								: "text-text-muted hover:text-text-primary"
-						}`}
-						aria-label="Card view"
-					>
-						<LayoutGrid className="h-4 w-4" />
-					</button>
-				</div>
+				<DataTableToolbar
+					table={table}
+					total={total}
+					view={effectiveView}
+					onViewChange={(v) => setParams({ view: v })}
+				/>
 			</div>
 
-			{isLoading ? (
-				<div className="space-y-3">
-					{[1, 2, 3].map((i) => (
-						<div
-							key={i}
-							className="h-16 animate-pulse rounded-lg bg-surface-raised"
-						/>
-					))}
-				</div>
-			) : changes.length === 0 ? (
-				<p className="py-8 text-center text-sm text-text-muted">
-					No changes recorded yet. Changes will appear here after the next CSV
-					poll.
-				</p>
-			) : effectiveView === "table" ? (
-				<div className="overflow-x-auto rounded-lg border border-border">
-					<DataTable table={table} />
-				</div>
-			) : (
-				<div className="space-y-2">
-					{changes.map((change) => {
-						const config =
-							TYPE_CONFIG[change.changeType] ?? TYPE_CONFIG.updated;
-						const Icon = config.icon;
-						return (
-							<div
-								key={change.id}
-								className={`flex items-start gap-3 rounded-lg border border-border border-l-2 ${config.border} bg-surface p-3`}
+			{/* Scrollable data area */}
+			<div className="flex-1 overflow-y-auto">
+				{effectiveView === "table" ? (
+					<DataTable table={table} isLoading={isLoading} />
+				) : (
+					<CardGrid changes={data?.data ?? []} isLoading={isLoading} />
+				)}
+			</div>
+
+			{/* Pagination footer */}
+			<div className="shrink-0">
+				<DataTablePagination
+					page={params.page}
+					pageSize={params.pageSize}
+					total={total}
+					onPageChange={(p) => setParams({ page: p })}
+					onPageSizeChange={(s) => setParams({ pageSize: s, page: 1 })}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function CardGrid({
+	changes,
+	isLoading,
+}: {
+	changes: Change[];
+	isLoading: boolean;
+}) {
+	if (isLoading) {
+		return (
+			<div className="space-y-2 p-1">
+				{[1, 2, 3].map((i) => (
+					<div
+						key={i}
+						className="h-16 animate-pulse rounded-lg bg-surface-raised"
+					/>
+				))}
+			</div>
+		);
+	}
+
+	if (changes.length === 0) {
+		return (
+			<div className="flex items-center justify-center py-16 text-sm text-text-muted">
+				No changes recorded yet. Changes will appear here after the next CSV poll.
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-2 p-1">
+			{changes.map((change) => {
+				const config = TYPE_CONFIG[change.changeType] ?? TYPE_CONFIG.updated;
+				const Icon = config.icon;
+				return (
+					<div
+						key={change.id}
+						className={`flex items-start gap-3 rounded-lg border border-border border-l-2 ${config.border} bg-surface p-3`}
+					>
+						<div className={`mt-0.5 rounded-full p-1.5 ${config.color}`}>
+							<Icon className="h-3.5 w-3.5" />
+						</div>
+						<div className="min-w-0 flex-1">
+							<Link
+								href={`/sponsor/${change.sponsorId}`}
+								className="text-sm font-medium text-text-primary transition-colors hover:text-primary"
 							>
-								<div className={`mt-0.5 rounded-full p-1.5 ${config.color}`}>
-									<Icon className="h-3.5 w-3.5" />
-								</div>
-								<div className="min-w-0 flex-1">
-									<Link
-										href={`/sponsor/${change.sponsorId}`}
-										className="text-sm font-medium text-text-primary transition-colors hover:text-primary"
-									>
-										{formatSponsorName(change.sponsorName)}
-									</Link>
-									{change.town && (
-										<span className="ml-2 text-xs text-text-muted">
-											{formatTown(change.town)}
+								{formatSponsorName(change.sponsorName)}
+							</Link>
+							{change.town && (
+								<span className="ml-2 text-xs text-text-muted">
+									{formatTown(change.town)}
+								</span>
+							)}
+							<p className="text-xs text-text-secondary">
+								{config.label}
+								{change.field && (
+									<>
+										{" \u2014 "}
+										{change.field}:{" "}
+										<span className="text-red-500">
+											{change.oldValue ?? "\u2014"}
 										</span>
-									)}
-									<p className="text-xs text-text-secondary">
-										{config.label}
-										{change.field && (
-											<>
-												{" \u2014 "}
-												{change.field}:{" "}
-												<span className="text-red-500">
-													{change.oldValue ?? "\u2014"}
-												</span>
-												<ArrowRight className="mx-1 inline h-3 w-3" />
-												<span className="text-green-600">
-													{change.newValue ?? "\u2014"}
-												</span>
-											</>
-										)}
-									</p>
-								</div>
-								<time className="shrink-0 text-xs text-text-muted">
-									{new Date(change.createdAt).toLocaleDateString()}
-								</time>
-							</div>
-						);
-					})}
-				</div>
-			)}
+										<ArrowRight className="mx-1 inline h-3 w-3" />
+										<span className="text-green-600">
+											{change.newValue ?? "\u2014"}
+										</span>
+									</>
+								)}
+							</p>
+						</div>
+						<time className="shrink-0 text-xs text-text-muted">
+							{new Date(change.createdAt).toLocaleDateString()}
+						</time>
+					</div>
+				);
+			})}
 		</div>
 	);
 }

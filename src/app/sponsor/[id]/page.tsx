@@ -182,7 +182,7 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 								{sponsor.firstSeenAt && (
 									<div>
 										<dt className="text-xs font-medium text-text-muted">
-											First seen
+											First tracked
 										</dt>
 										<dd className="mt-0.5 text-sm text-text-primary">
 											{sponsor.firstSeenAt.toLocaleDateString()}
@@ -192,7 +192,7 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 								{sponsor.lastSeenAt && (
 									<div>
 										<dt className="text-xs font-medium text-text-muted">
-											Last seen
+											Last tracked
 										</dt>
 										<dd className="mt-0.5 text-sm text-text-primary">
 											{sponsor.lastSeenAt.toLocaleDateString()}
@@ -202,7 +202,7 @@ export default async function SponsorPage({ params }: SponsorPageProps) {
 								{daysOnRegister !== null && (
 									<div>
 										<dt className="text-xs font-medium text-text-muted">
-											Days on register
+											Days tracked
 										</dt>
 										<dd className="mt-0.5 text-sm text-text-primary">
 											{daysOnRegister.toLocaleString()}
